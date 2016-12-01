@@ -2,32 +2,36 @@ package com.example.guest.starstalker;
 
 import org.parceler.Parcel;
 
+import java.util.ArrayList;
+
 /**
  * Created by Guest on 12/1/16.
  */
 @Parcel
 public class Movie {
-    String mtitle;
+    String mTitle;
     int mId;
     String mPosterPath;
     String mOverview;
     String mReleaseDate;
-    double mRating;
+    int mRating;
+    String mDirector;
+    ArrayList<Actor> mActors = new ArrayList<>();
 
-    public Movie(String mtitle, int id) {
-        this.mtitle = mtitle;
+    public Movie(String mTitle, int id) {
+        this.mTitle = mTitle;
         mId = id;
     }
 
     public Movie() {
     }
 
-    public String getMtitle() {
-        return mtitle;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public void setMtitle(String mtitle) {
-        this.mtitle = mtitle;
+    public void setTitle(String mTitle) {
+        this.mTitle = mTitle;
     }
 
     public int getId() {
@@ -46,6 +50,13 @@ public class Movie {
         mPosterPath = posterPath;
     }
 
+    public String getImageUrl() {
+        String url = "https://image.tmdb.org/t/p/";
+        url += "original/";
+        url += mPosterPath;
+        return url;
+    }
+
     public String getOverview() {
         return mOverview;
     }
@@ -62,11 +73,27 @@ public class Movie {
         mReleaseDate = releaseDate;
     }
 
-    public double getRating() {
+    public int getRating() {
         return mRating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(int rating) {
         mRating = rating;
+    }
+
+    public String getDirector() {
+        return mDirector;
+    }
+
+    public void setDirector(String director) {
+        mDirector = director;
+    }
+
+    public ArrayList<Actor> getActors() {
+        return mActors;
+    }
+
+    public void setActors(ArrayList<Actor> actors) {
+        mActors = actors;
     }
 }

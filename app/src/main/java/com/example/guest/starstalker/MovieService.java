@@ -50,7 +50,7 @@ public class MovieService {
         call.enqueue(callback);
     }
 
-    public ArrayList<Movie> processResults(Response response) {
+    public ArrayList<Movie> processListResults(Response response) {
         ArrayList<Movie> movies = new ArrayList<>();
 
         try {
@@ -72,5 +72,43 @@ public class MovieService {
         }
 
         return movies;
+    }
+
+    public Movie  processMovieResults(Response response) {
+        Movie movie = new Movie();
+
+        try {
+            String jsonData = response.body().string();
+            if(response.isSuccessful()) {
+                JSONObject movieJSON = new JSONObject(jsonData);
+                movie.setTitle(movieJSON.getString("title"));
+                movie.setId(movieJSON.getInt("id"));
+                movie.setOverview(movieJSON.getString("overview"));
+                movie.setPosterPath(movieJSON.getString("poster_path"));
+                movie.setReleaseDate(movieJSON.getString("release_date"));
+                movie.setRating((int)Math.round(movieJSON.getDouble("popularity")));
+                JSONArray actorArray = movieJSON.getJSONObject("credits").getJSONArray("cast");
+                for(int i=0; i < actorArray.length(); i++){
+                    JSONObject currentActor = actorArray.getJSONObject(i);
+                    String name = currentActor.getString("name");
+                    int id = currentActor.getInt("id");
+                    Actor actor = new Actor(name, id);
+                    movie.getActors().add(actor);
+                }
+                JSONArray crewArray = movieJSON.getJSONObject("credits").getJSONArray("crew");
+                for(int i=0; i < crewArray.length(); i++){
+                    JSONObject currentCrew = crewArray.getJSONObject(i);
+                    if(currentCrew.getString("job").equals("Director")){
+                        movie.setDirector(currentCrew.getString("name"));
+                        break;
+                    }
+                }
+
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+
+        return movie;
     }
 }

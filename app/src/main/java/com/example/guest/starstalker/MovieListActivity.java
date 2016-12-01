@@ -8,8 +8,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.parceler.Parcels;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -48,13 +46,13 @@ public class MovieListActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                mMovies = movieService.processResults(response);
+                mMovies = movieService.processListResults(response);
                 MovieListActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String[] movieTitles = new String[mMovies.size()];
                         for(int i = 0; i < mMovies.size(); i++){
-                            movieTitles[i] = mMovies.get(i).getMtitle();
+                            movieTitles[i] = mMovies.get(i).getTitle();
                         }
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(MovieListActivity.this, android.R.layout.simple_list_item_1, movieTitles);
                         mMovieListView.setAdapter(adapter);
