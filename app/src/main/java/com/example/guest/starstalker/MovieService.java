@@ -21,6 +21,8 @@ import okhttp3.Response;
  */
 public class MovieService {
 
+    private static final String TAG = MovieService.class.getSimpleName();
+
     public static void getMovieSearchResults(String searchString, Callback callback){
         OkHttpClient client = new OkHttpClient.Builder().build();
         HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.API_URL).newBuilder();
@@ -43,6 +45,20 @@ public class MovieService {
         urlBuilder.addPathSegment(movieId+"");
         urlBuilder.addQueryParameter(Constants.API_KEY_QUERY, Constants.API_KEY);
         urlBuilder.addQueryParameter(Constants.APPEND_TO_RESPONSE_QUERY, "credits");
+        String url = urlBuilder.build().toString();
+        //Log.i("MovieService", "getMovieSearchResults: " + url);
+        Request request = new Request.Builder().url(url).build();
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+    }
+
+    public static void getActorResult(int actorId, Callback callback){
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.API_URL).newBuilder();
+        urlBuilder.addPathSegment(Constants.PERSON_PATH);
+        urlBuilder.addPathSegment(actorId+"");
+        urlBuilder.addQueryParameter(Constants.API_KEY_QUERY, Constants.API_KEY);
+        urlBuilder.addQueryParameter(Constants.APPEND_TO_RESPONSE_QUERY, "movie_credits");
         String url = urlBuilder.build().toString();
         //Log.i("MovieService", "getMovieSearchResults: " + url);
         Request request = new Request.Builder().url(url).build();
@@ -110,5 +126,32 @@ public class MovieService {
         }
 
         return movie;
+    }
+
+    public Actor  processActorResults(Response response) {
+        Actor actor = new Actor();
+
+        try {
+            String jsonData = response.body().string();
+            if(response.isSuccessful()) {
+                JSONObject actorJSON = new JSONObject(jsonData);
+                actor.setName(actorJSON.getString("name"));
+                actor.setId(actorJSON.getInt("id"));
+                JSONArray movieArray = actorJSON.getJSONObject("movie_credits").getJSONArray("cast");
+                Log.i(TAG, "processActorResults: " + movieArray.toString());
+                for(int i=0; i < movieArray.length(); i++){
+                    Movie movie = new Movie();
+                    JSONObject currentMovie = movieArray.getJSONObject(i);
+                    movie.setTitle(currentMovie.getString("title"));
+                    movie.setPosterPath(currentMovie.getString("poster_path"));
+                    movie.setId(currentMovie.getInt("id"));
+                    actor.getMovies().add(movie);
+                }
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+
+        return actor;
     }
 }
